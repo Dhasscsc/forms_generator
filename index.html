@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>முழுமையான படிவ உருவாக்கி</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #dc2626;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --border: #cbd5e1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Nirmala UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .app-header {
+            background: linear-gradient(to right, var(--primary), #1e40af);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+        }
+
+        .app-header h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .app-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 75vh;
+        }
+
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .controls-panel {
+            background: var(--light);
+            padding: 20px;
+            border-right: 1px solid var(--border);
+        }
+
+        .form-preview {
+            padding: 25px;
+            background: white;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 20px 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--dark);
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-warning {
+            background: #d97706;
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        /* படிவ முன்னோட்டம் */
+        .form-preview-page {
+            background: white;
+            min-height: 1123px;
+            padding: 30px 40px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.08);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .form-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .logo-section {
+            text-align: center;
+        }
+
+        .logo-box {
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin: 0 auto 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-placeholder {
+            color: #94a3b8;
+            font-size: 24px;
+        }
+
+        .title-section {
+            text-align: center;
+        }
+
+        .form-main-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .form-sub-title {
+            font-size: 16px;
+            color: #475569;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-details {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .stamp-section {
+            text-align: center;
+        }
+
+        .stamp-box {
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stamp-placeholder {
+            color: #94a3b8;
+            font-size: 24px;
+        }
+
+        .form-body {
+            margin-top: 20px;
+        }
+
+        /* பீல்டு ஸ்டைல்கள் */
+        .field-row {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .field-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            line-height: 1.4;
+        }
+
+        .field-input.large {
+            min-height: 100px;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .field-input.extra-large {
+            min-height: 180px;
+            padding: 18px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* டேபில் பீல்டு ஸ்டைல்கள் */
+        .table-field-container {
+            margin-top: 10px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .table-field {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .table-field th {
+            background: #f1f5f9;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .table-field td {
+            padding: 8px;
+            border: 1px solid var(--border);
+            min-width: 150px;
+        }
+
+        .table-field input,
+        .table-field textarea,
+        .table-field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 3px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .table-field textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-controls button {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* லேஅவுட் ஸ்டைல்கள் */
+        .layout-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .layout-single {
+            grid-template-columns: 1fr;
+        }
+
+        .layout-double {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .layout-mixed {
+            display: grid;
+            gap: 20px;
+        }
+
+        .layout-mixed .mixed-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .layout-mixed .mixed-section.full-width {
+            grid-template-columns: 1fr;
+        }
+
+        /* கட்டாய கட்டங்கள் */
+        .required-documents {
+            margin: 25px 0;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .documents-list {
+            list-style: decimal;
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .documents-list li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+
+        /* கலர் மற்றும் பேக்கிரவுண்ட் */
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .color-option.active {
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .background-preview {
+            width: 100%;
+            height: 50px;
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* பிரிண்ட் ஸ்டைல்கள் */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .app-container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+            }
+            
+            .app-header,
+            .controls-panel,
+            .form-actions,
+            .section-title i,
+            .btn,
+            .color-picker,
+            .background-upload,
+            .field-controls,
+            .layout-selector,
+            .table-controls {
+                display: none !important;
+            }
+            
+            .form-preview {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+            
+            .form-preview-page {
+                box-shadow: none !important;
+                padding: 20mm !important;
+                margin: 0 !important;
+                page-break-after: always;
+                min-height: auto !important;
+            }
+            
+            .form-header {
+                page-break-after: avoid;
+            }
+            
+            .field-row {
+                page-break-inside: avoid;
+            }
+            
+            .field-input {
+                background: white !important;
+                color: black !important;
+                border: 1px solid #333 !important;
+            }
+            
+            .required-documents {
+                border: 1px solid #333 !important;
+                background: white !important;
+            }
+            
+            .table-field {
+                border: 1px solid #333 !important;
+            }
+            
+            .table-field th,
+            .table-field td {
+                border: 1px solid #333 !important;
+                background: white !important;
+                color: black !important;
+            }
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .field-controls {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .field-controls button {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .layout-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .layout-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .layout-btn.active {
+            border-color: var(--primary);
+            background: #e0f2fe;
+            font-weight: 600;
+        }
+
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary);
+            background: #f1f5f9;
+        }
+
+        .info-text {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .field-edit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        .field-type-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .field-type-item {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 12px;
+        }
+
+        .field-type-item:hover {
+            border-color: var(--primary);
+            background: #f0f9ff;
+        }
+
+        .field-type-item i {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .predefined-fields {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .predefined-field {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .predefined-field:hover {
+            background: #e0f2fe;
+            border-color: var(--primary);
+        }
+
+        .edit-field-row {
+            margin-bottom: 15px;
+        }
+
+        .edit-field-row label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .edit-field-row input,
+        .edit-field-row textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .lang-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .field-label-en {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: normal;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const React = window.React;
+        const ReactDOM = window.ReactDOM;
+
+        function AdvancedFormBuilder() {
+            // படிவ அமைப்புகள்
+            const [settings, setSettings] = React.useState({
+                officeName: 'தமிழ்நாடு அரசு',
+                officeNameEn: 'Government of Tamil Nadu',
+                department: 'கல்வி துறை',
+                departmentEn: 'Education Department',
+                formTitle: 'விண்ணப்பப் படிவம்',
+                formTitleEn: 'Application Form',
+                formSubtitle: 'மாணவர் சேர்க்கை விண்ணப்பம்',
+                formSubtitleEn: 'Student Admission Application',
+                formNumber: 'படிவம் எண்: TN/EDU/2024/001',
+                language: 'tamil',
+                layout: 'mixed',
+                textColor: '#000000',
+                backgroundColor: '#ffffff',
+                backgroundImage: null
+            });
+
+            // தலைப்பு வரிகள்
+            const [titleRows, setTitleRows] = React.useState([
+                { id: 1, text: 'தமிழ்நாடு அரசு', textEn: 'Government of Tamil Nadu' },
+                { id: 2, text: 'கல்வி துறை', textEn: 'Education Department' },
+                { id: 3, text: 'படிவம் எண்: TN/EDU/2024/001', textEn: 'Form No: TN/EDU/2024/001' }
+            ]);
+
+            // லோகோக்கள்
+            const [logo1, setLogo1] = React.useState(null);
+            const [logo2, setLogo2] = React.useState(null);
+            
+            // பேக்கிரவுண்ட் படம்
+            const [backgroundImage, setBackgroundImage] = React.useState(null);
+
+            // பீல்டு எடிட் மோடல்
+            const [editingField, setEditingField] = React.useState(null);
+
+            // அனைத்து பீல்டுகள் - இன்சர்ட் டேபில் பீல்டு சேர்க்கப்பட்டுள்ளது
+            const [fields, setFields] = React.useState([
+                { 
+                    id: 1, 
+                    type: 'text', 
+                    label: 'விண்ணப்பதாரர் பெயர்',
+                    labelEn: 'Applicant Name',
+                    placeholder: 'முழு பெயரை உள்ளிடவும்',
+                    placeholderEn: 'Enter full name',
+                    size: 'medium',
+                    required: true
+                },
+                { 
+                    id: 2, 
+                    type: 'text', 
+                    label: 'தந்தை பெயர்',
+                    labelEn: 'Father Name',
+                    placeholder: 'தந்தையின் முழு பெயர்',
+                    placeholderEn: 'Enter father\'s full name',
+                    size: 'medium',
+                    required: true
+                },
+                { 
+                    id: 3, 
+                    type: 'date', 
+                    label: 'பிறந்த தேதி',
+                    labelEn: 'Date of Birth',
+                    placeholder: 'பிறந்த தேதியைத் தேர்ந்தெடுக்கவும்',
+                    placeholderEn: 'Select date of birth',
+                    size: 'medium',
+                    required: true
+                },
+                { 
+                    id: 4, 
+                    type: 'text', 
+                    label: 'ஆதார் எண்',
+                    labelEn: 'Aadhar Number',
+                    placeholder: '12 இலக்க ஆதார் எண்',
+                    placeholderEn: '12 digit Aadhar number',
+                    size: 'medium',
+                    required: true
+                },
+                { 
+                    id: 5, 
+                    type: 'tel', 
+                    label: 'தொலைபேசி எண்',
+                    labelEn: 'Phone Number',
+                    placeholder: '10 இலக்க தொலைபேசி எண்',
+                    placeholderEn: '10 digit phone number',
+                    size: 'medium',
+                    required: true
+                },
+                { 
+                    id: 6, 
+                    type: 'email', 
+                    label: 'மின்னஞ்சல்',
+                    labelEn: 'Email',
+                    placeholder: 'மின்னஞ்சல் முகவரி',
+                    placeholderEn: 'Email address',
+                    size: 'medium',
+                    required: false
+                },
+                { 
+                    id: 7, 
+                    type: 'select', 
+                    label: 'பாலினம்',
+                    labelEn: 'Gender',
+                    placeholder: 'பாலினத்தைத் தேர்ந்தெடுக்கவும்',
+                    placeholderEn: 'Select gender',
+                    size: 'medium',
+                    required: true,
+                    options: ['ஆண்', 'பெண்', 'மற்றவை'],
+                    optionsEn: ['Male', 'Female', 'Other']
+                },
+                { 
+                    id: 8, 
+                    type: 'text', 
+                    label: 'கல்வித் தகுதி',
+                    labelEn: 'Educational Qualification',
+                    placeholder: 'கடைசி படித்த தகுதி',
+                    placeholderEn: 'Last educational qualification',
+                    size: 'medium',
+                    required: false
+                },
+                { 
+                    id: 9, 
+                    type: 'address', 
+                    label: 'நிரந்தர முகவரி',
+                    labelEn: 'Permanent Address',
+                    placeholder: 'வீட்டு எண், தெரு, ஊர், மாவட்டம், முன்னுரிமை குறியீடு',
+                    placeholderEn: 'House No, Street, Town, District, PIN Code',
+                    size: 'large',
+                    required: true
+                },
+                { 
+                    id: 10, 
+                    type: 'address', 
+                    label: 'தற்கால முகவரி',
+                    labelEn: 'Current Address',
+                    placeholder: 'தற்கால முகவரியை உள்ளிடவும்',
+                    placeholderEn: 'Enter current address',
+                    size: 'large',
+                    required: false
+                },
+                { 
+                    id: 11, 
+                    type: 'documents', 
+                    label: 'தேவையான ஆவணங்கள்',
+                    labelEn: 'Required Documents',
+                    placeholder: '1. பிறப்புச் சான்றிதழ் (படி)\n2. குடியிருப்புச் சான்றிதழ்\n3. கல்விச் சான்றிதழ்\n4. வருமானச் சான்றிதழ்\n5. ஆதார் அட்டை படி\n6. புகைப்படம்',
+                    placeholderEn: '1. Birth Certificate (Copy)\n2. Residence Certificate\n3. Educational Certificate\n4. Income Certificate\n5. Aadhar Card Copy\n6. Photograph',
+                    size: 'extra-large',
+                    required: false
+                },
+                { 
+                    id: 12, 
+                    type: 'subtitle', 
+                    label: 'கல்வித் தகவல்கள்',
+                    labelEn: 'Educational Details',
+                    placeholder: 'பள்ளி / கல்லூரி தகவல்கள்:\n• பள்ளி பெயர்:\n• படித்த ஆண்டு:\n• பெற்ற மதிப்பெண்:',
+                    placeholderEn: 'School / College Details:\n• School Name:\n• Year of Study:\n• Marks Obtained:',
+                    size: 'large',
+                    required: false
+                },
+                { 
+                    id: 13, 
+                    type: 'textarea', 
+                    label: 'கூடுதல் தகவல்கள்',
+                    labelEn: 'Additional Information',
+                    placeholder: 'முக்கிய கூடுதல் தகவல்கள் ஏதேனும் இருப்பின் இங்கே எழுதவும்',
+                    placeholderEn: 'Write any important additional information here',
+                    size: 'extra-large',
+                    required: false
+                },
+                // இன்சர்ட் டேபில் பீல்டு - புதியதாக சேர்க்கப்பட்டது
+                { 
+                    id: 14, 
+                    type: 'table', 
+                    label: 'குடும்ப உறுப்பினர் விவரங்கள்',
+                    labelEn: 'Family Member Details',
+                    placeholder: '',
+                    placeholderEn: '',
+                    size: 'extra-large',
+                    required: false,
+                    tableData: {
+                        columns: [
+                            { id: 1, name: 'பெயர்', nameEn: 'Name' },
+                            { id: 2, name: 'வயது', nameEn: 'Age' },
+                            { id: 3, name: 'தொழில்', nameEn: 'Occupation' },
+                            { id: 4, name: 'தொலைபேசி எண்', nameEn: 'Phone Number' }
+                        ],
+                        rows: [
+                            { id: 1, data: ['', '', '', ''] },
+                            { id: 2, data: ['', '', '', ''] },
+                            { id: 3, data: ['', '', '', ''] }
+                        ]
+                    }
+                }
+            ]);
+
+            // முன்னரே வரையறுக்கப்பட்ட பீல்டுகள்
+            const predefinedFields = [
+                { type: 'text', label: 'பெயர்', labelEn: 'Name', icon: 'fas fa-user' },
+                { type: 'date', label: 'பிறந்த தேதி', labelEn: 'Date of Birth', icon: 'fas fa-calendar' },
+                { type: 'text', label: 'தந்தை பெயர்', labelEn: 'Father Name', icon: 'fas fa-male' },
+                { type: 'text', label: 'தாய் பெயர்', labelEn: 'Mother Name', icon: 'fas fa-female' },
+                { type: 'tel', label: 'தொலைபேசி', labelEn: 'Phone', icon: 'fas fa-phone' },
+                { type: 'email', label: 'மின்னஞ்சல்', labelEn: 'Email', icon: 'fas fa-envelope' },
+                { type: 'text', label: 'ஆதார் எண்', labelEn: 'Aadhar Number', icon: 'fas fa-id-card' },
+                { type: 'address', label: 'முகவரி', labelEn: 'Address', icon: 'fas fa-map-marker-alt' },
+                { type: 'select', label: 'பாலினம்', labelEn: 'Gender', icon: 'fas fa-venus-mars' },
+                { type: 'text', label: 'வயது', labelEn: 'Age', icon: 'fas fa-birthday-cake' },
+                { type: 'table', label: 'டேபில்', labelEn: 'Table', icon: 'fas fa-table' }
+            ];
+
+            // கலர் விருப்பங்கள்
+            const colorOptions = [
+                '#000000', '#1e3a8a', '#0369a1', '#0f766e', '#059669',
+                '#ca8a04', '#ea580c', '#dc2626', '#7c3aed', '#db2777'
+            ];
+
+            // அமைப்புகள் மாற்றம்
+            const updateSetting = (key, value) => {
+                setSettings(prev => ({ ...prev, [key]: value }));
+            };
+
+            // தலைப்பு வரி சேர்க்க
+            const addTitleRow = () => {
+                const newRow = {
+                    id: Date.now(),
+                    text: 'புதிய தலைப்பு வரி',
+                    textEn: 'New title line'
+                };
+                setTitleRows([...titleRows, newRow]);
+            };
+
+            // தலைப்பு வரி நீக்க
+            const removeTitleRow = (id) => {
+                if (titleRows.length > 1) {
+                    setTitleRows(titleRows.filter(row => row.id !== id));
+                }
+            };
+
+            // தலைப்பு வரி திருத்த
+            const updateTitleRow = (id, key, value) => {
+                setTitleRows(titleRows.map(row => 
+                    row.id === id ? { ...row, [key]: value } : row
+                ));
+            };
+
+            // லோகோ பதிவேற்றம்
+            const handleLogoUpload = (setLogoFunction) => (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        setLogoFunction(event.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            // பேக்கிரவுண்ட் பதிவேற்றம்
+            const handleBackgroundUpload = (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        setBackgroundImage(event.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            // பீல்டு சேர்க்க
+            const addField = (fieldType, label = '', labelEn = '') => {
+                let size = 'medium';
+                if (fieldType === 'address' || fieldType === 'subtitle') size = 'large';
+                if (fieldType === 'documents' || fieldType === 'textarea' || fieldType === 'table') size = 'extra-large';
+
+                const fieldConfigs = {
+                    text: { label: 'புதிய கட்டம்', labelEn: 'New Field' },
+                    address: { label: 'முகவரி', labelEn: 'Address' },
+                    documents: { label: 'ஆவண பட்டியல்', labelEn: 'Documents List' },
+                    subtitle: { label: 'துணைத் தலைப்பு', labelEn: 'Subtitle' },
+                    textarea: { label: 'கூடுதல் தகவல்', labelEn: 'Additional Info' },
+                    date: { label: 'தேதி', labelEn: 'Date' },
+                    tel: { label: 'தொலைபேசி', labelEn: 'Phone' },
+                    email: { label: 'மின்னஞ்சல்', labelEn: 'Email' },
+                    select: { label: 'தேர்வு பட்டியல்', labelEn: 'Dropdown' },
+                    table: { 
+                        label: 'டேபில் தரவு', 
+                        labelEn: 'Table Data',
+                        tableData: {
+                            columns: [
+                                { id: 1, name: 'நெடுவரிசை 1', nameEn: 'Column 1' },
+                                { id: 2, name: 'நெடுவரிசை 2', nameEn: 'Column 2' },
+                                { id: 3, name: 'நெடுவரிசை 3', nameEn: 'Column 3' }
+                            ],
+                            rows: [
+                                { id: 1, data: ['', '', ''] },
+                                { id: 2, data: ['', '', ''] }
+                            ]
+                        }
+                    }
+                };
+
+                const newField = {
+                    id: Date.now(),
+                    type: fieldType,
+                    label: label || fieldConfigs[fieldType].label,
+                    labelEn: labelEn || fieldConfigs[fieldType].labelEn,
+                    placeholder: fieldType === 'documents' ? 
+                        '1. ஆவணம் 1\n2. ஆவணம் 2\n3. ஆவணம் 3' :
+                        fieldType === 'table' ? '' : 'தகவலை உள்ளிடவும்...',
+                    placeholderEn: fieldType === 'documents' ?
+                        '1. Document 1\n2. Document 2\n3. Document 3' :
+                        fieldType === 'table' ? '' : 'Enter information...',
+                    size: size,
+                    required: false,
+                    options: fieldType === 'select' ? ['விருப்பம் 1', 'விருப்பம் 2', 'விருப்பம் 3'] : undefined,
+                    optionsEn: fieldType === 'select' ? ['Option 1', 'Option 2', 'Option 3'] : undefined,
+                    tableData: fieldType === 'table' ? fieldConfigs.table.tableData : undefined
+                };
+
+                setFields([...fields, newField]);
+            };
+
+            // பீல்டு நீக்க
+            const removeField = (id) => {
+                setFields(fields.filter(field => field.id !== id));
+            };
+
+            // பீல்டு திருத்த
+            const updateField = (id, updates) => {
+                setFields(fields.map(field => 
+                    field.id === id ? { ...field, ...updates } : field
+                ));
+            };
+
+            // பீல்டு நகர்த்த
+            const moveField = (id, direction) => {
+                const index = fields.findIndex(f => f.id === id);
+                if (index === -1) return;
+
+                const newFields = [...fields];
+                if (direction === 'up' && index > 0) {
+                    [newFields[index], newFields[index - 1]] = [newFields[index - 1], newFields[index]];
+                } else if (direction === 'down' && index < newFields.length - 1) {
+                    [newFields[index], newFields[index + 1]] = [newFields[index + 1], newFields[index]];
+                }
+                setFields(newFields);
+            };
+
+            // டேபில் பீல்டு மேலாண்மை
+            const addTableColumn = (fieldId) => {
+                setFields(fields.map(field => {
+                    if (field.id === fieldId && field.type === 'table') {
+                        const newColId = Math.max(...field.tableData.columns.map(c => c.id), 0) + 1;
+                        const newColumns = [...field.tableData.columns, { 
+                            id: newColId, 
+                            name: 'புதிய நெடுவரிசை', 
+                            nameEn: 'New Column' 
+                        }];
+                        const newRows = field.tableData.rows.map(row => ({
+                            ...row,
+                            data: [...row.data, '']
+                        }));
+                        return {
+                            ...field,
+                            tableData: {
+                                ...field.tableData,
+                                columns: newColumns,
+                                rows: newRows
+                            }
+                        };
+                    }
+                    return field;
+                }));
+            };
+
+            const addTableRow = (fieldId) => {
+                setFields(fields.map(field => {
+                    if (field.id === fieldId && field.type === 'table') {
+                        const newRowId = Math.max(...field.tableData.rows.map(r => r.id), 0) + 1;
+                        const newRows = [...field.tableData.rows, { 
+                            id: newRowId, 
+                            data: Array(field.tableData.columns.length).fill('') 
+                        }];
+                        return {
+                            ...field,
+                            tableData: {
+                                ...field.tableData,
+                                rows: newRows
+                            }
+                        };
+                    }
+                    return field;
+                }));
+            };
+
+            const removeTableColumn = (fieldId, colIndex) => {
+                setFields(fields.map(field => {
+                    if (field.id === fieldId && field.type === 'table') {
+                        const newColumns = field.tableData.columns.filter((_, i) => i !== colIndex);
+                        const newRows = field.tableData.rows.map(row => ({
+                            ...row,
+                            data: row.data.filter((_, i) => i !== colIndex)
+                        }));
+                        return {
+                            ...field,
+                            tableData: {
+                                ...field.tableData,
+                                columns: newColumns,
+                                rows: newRows
+                            }
+                        };
+                    }
+                    return field;
+                }));
+            };
+
+            const removeTableRow = (fieldId, rowIndex) => {
+                setFields(fields.map(field => {
+                    if (field.id === fieldId && field.type === 'table') {
+                        const newRows = field.tableData.rows.filter((_, i) => i !== rowIndex);
+                        return {
+                            ...field,
+                            tableData: {
+                                ...field.tableData,
+                                rows: newRows
+                            }
+                        };
+                    }
+                    return field;
+                }));
+            };
+
+            const updateTableColumnName = (fieldId, colIndex, field, value) => {
+                setFields(fields.map(fieldItem => {
+                    if (fieldItem.id === fieldId && fieldItem.type === 'table') {
+                        const newColumns = [...fieldItem.tableData.columns];
+                        newColumns[colIndex][field] = value;
+                        return {
+                            ...fieldItem,
+                            tableData: {
+                                ...fieldItem.tableData,
+                                columns: newColumns
+                            }
+                        };
+                    }
+                    return fieldItem;
+                }));
+            };
+
+            const updateTableCellData = (fieldId, rowIndex, colIndex, value) => {
+                setFields(fields.map(fieldItem => {
+                    if (fieldItem.id === fieldId && fieldItem.type === 'table') {
+                        const newRows = [...fieldItem.tableData.rows];
+                        newRows[rowIndex].data[colIndex] = value;
+                        return {
+                            ...fieldItem,
+                            tableData: {
+                                ...fieldItem.tableData,
+                                rows: newRows
+                            }
+                        };
+                    }
+                    return fieldItem;
+                }));
+            };
+
+            // பீல்டு எடிட் தொடங்கு
+            const startEditField = (field) => {
+                setEditingField(field);
+            };
+
+            // பீல்டு எடிட் சேமிக்க
+            const saveEditField = (updatedField) => {
+                updateField(updatedField.id, updatedField);
+                setEditingField(null);
+            };
+
+            // அச்சிடு
+            const printForm = () => {
+                window.print();
+            };
+
+            // சேமிக்க
+            const saveForm = () => {
+                const formData = {
+                    settings,
+                    titleRows,
+                    fields,
+                    logo1,
+                    logo2,
+                    backgroundImage
+                };
+                
+                const json = JSON.stringify(formData, null, 2);
+                const blob = new Blob([json], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${settings.formTitle.replace(/\s+/g, '_')}.json`;
+                a.click();
+                
+                alert('படிவம் சேமிக்கப்பட்டது!');
+            };
+
+            // மொழியைப் பொறுத்து டெக்ஸ்ட் காட்ட
+            const getText = (tamil, english) => {
+                if (settings.language === 'tamil') return tamil;
+                if (settings.language === 'english') return english;
+                return `${tamil}`;
+            };
+
+            // டேபில் பீல்டு காட்ட
+            const renderTableField = (field) => {
+                const tableData = field.tableData || { columns: [], rows: [] };
+                
+                return (
+                    <div className="table-field-container">
+                        <table className="table-field">
+                            <thead>
+                                <tr>
+                                    {tableData.columns.map((col, colIndex) => (
+                                        <th key={col.id}>
+                                            <input
+                                                type="text"
+                                                value={settings.language === 'english' ? col.nameEn : col.name}
+                                                onChange={(e) => updateTableColumnName(field.id, colIndex, 
+                                                    settings.language === 'english' ? 'nameEn' : 'name', e.target.value)}
+                                                placeholder="நெடுவரிசை பெயர்"
+                                                style={{fontWeight: 'bold', textAlign: 'center'}}
+                                            />
+                                        </th>
+                                    ))}
+                                    <th style={{width: '50px', textAlign: 'center'}}>
+                                        செயல்
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tableData.rows.map((row, rowIndex) => (
+                                    <tr key={row.id}>
+                                        {tableData.columns.map((col, colIndex) => (
+                                            <td key={`${row.id}-${col.id}`}>
+                                                <input
+                                                    type="text"
+                                                    value={row.data[colIndex] || ''}
+                                                    onChange={(e) => updateTableCellData(field.id, rowIndex, colIndex, e.target.value)}
+                                                    placeholder="தகவல்"
+                                                />
+                                            </td>
+                                        ))}
+                                        <td style={{textAlign: 'center'}}>
+                                            <button 
+                                                className="btn btn-danger" 
+                                                onClick={() => removeTableRow(field.id, rowIndex)}
+                                                style={{padding: '3px 6px', fontSize: '10px'}}
+                                                disabled={tableData.rows.length <= 1}
+                                            >
+                                                <i className="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        
+                        <div className="table-controls">
+                            <button className="btn btn-success" onClick={() => addTableRow(field.id)}>
+                                <i className="fas fa-plus"></i> வரிசை சேர்க்க
+                            </button>
+                            <button className="btn btn-primary" onClick={() => addTableColumn(field.id)}>
+                                <i className="fas fa-plus"></i> நெடுவரிசை சேர்க்க
+                            </button>
+                            <button className="btn btn-warning" onClick={() => {
+                                if (tableData.columns.length > 1) {
+                                    removeTableColumn(field.id, tableData.columns.length - 1);
+                                }
+                            }} disabled={tableData.columns.length <= 1}>
+                                <i className="fas fa-minus"></i> நெடுவரிசை நீக்க
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            // பீல்டு உள்ளீடு காட்ட
+            const renderFieldInput = (field) => {
+                const placeholder = getText(field.placeholder, field.placeholderEn);
+                const inputStyles = {
+                    color: settings.textColor,
+                    fontSize: '14px',
+                    minHeight: field.size === 'medium' ? 'auto' : 
+                               field.size === 'large' ? '100px' : '180px'
+                };
+
+                if (field.type === 'table') {
+                    return renderTableField(field);
+                } else if (field.type === 'select') {
+                    const options = settings.language === 'english' && field.optionsEn ? 
+                                  field.optionsEn : field.options || [];
+                    
+                    return (
+                        <select className="field-input" style={inputStyles}>
+                            <option value="">{getText('தேர்ந்தெடுக்கவும்', 'Select')}</option>
+                            {options.map((option, idx) => (
+                                <option key={idx} value={option}>{option}</option>
+                            ))}
+                        </select>
+                    );
+                } else if (field.type === 'address' || field.type === 'textarea' || 
+                         field.type === 'documents' || field.type === 'subtitle') {
+                    return (
+                        <textarea
+                            className={`field-input ${field.size}`}
+                            placeholder={placeholder}
+                            style={inputStyles}
+                            rows={field.size === 'large' ? 4 : 6}
+                        />
+                    );
+                } else {
+                    return (
+                        <input
+                            type={field.type}
+                            className="field-input"
+                            placeholder={placeholder}
+                            style={inputStyles}
+                        />
+                    );
+                }
+            };
+
+            // எடிட் மோடல்
+            const EditFieldModal = () => {
+                const [fieldData, setFieldData] = React.useState(editingField || {});
+
+                const handleSave = () => {
+                    saveEditField(fieldData);
+                };
+
+                const handleChange = (key, value) => {
+                    setFieldData(prev => ({ ...prev, [key]: value }));
+                };
+
+                return (
+                    <div className="field-edit-modal">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <div className="modal-title">பீல்டு திருத்தம்</div>
+                                <button className="close-modal" onClick={() => setEditingField(null)}>
+                                    <i className="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <div className="edit-field-row">
+                                <label>பீல்டு பெயர் (தமிழ்)</label>
+                                <input
+                                    type="text"
+                                    value={fieldData.label || ''}
+                                    onChange={(e) => handleChange('label', e.target.value)}
+                                />
+                            </div>
+                            
+                            <div className="edit-field-row">
+                                <label>பீல்டு பெயர் (ஆங்கிலம்)</label>
+                                <input
+                                    type="text"
+                                    value={fieldData.labelEn || ''}
+                                    onChange={(e) => handleChange('labelEn', e.target.value)}
+                                />
+                            </div>
+                            
+                            <div className="edit-field-row">
+                                <label>வகை</label>
+                                <select
+                                    value={fieldData.type || 'text'}
+                                    onChange={(e) => handleChange('type', e.target.value)}
+                                >
+                                    <option value="text">உரை</option>
+                                    <option value="date">தேதி</option>
+                                    <option value="tel">தொலைபேசி</option>
+                                    <option value="email">மின்னஞ்சல்</option>
+                                    <option value="select">தேர்வு பட்டியல்</option>
+                                    <option value="address">முகவரி</option>
+                                    <option value="documents">ஆவண பட்டியல்</option>
+                                    <option value="subtitle">துணைத் தலைப்பு</option>
+                                    <option value="textarea">நீண்ட உரை</option>
+                                    <option value="table">டேபில்</option>
+                                </select>
+                            </div>
+                            
+                            <div className="edit-field-row">
+                                <label>சான்று உரை (தமிழ்)</label>
+                                <textarea
+                                    value={fieldData.placeholder || ''}
+                                    onChange={(e) => handleChange('placeholder', e.target.value)}
+                                    rows="3"
+                                />
+                            </div>
+                            
+                            <div className="edit-field-row">
+                                <label>சான்று உரை (ஆங்கிலம்)</label>
+                                <textarea
+                                    value={fieldData.placeholderEn || ''}
+                                    onChange={(e) => handleChange('placeholderEn', e.target.value)}
+                                    rows="3"
+                                />
+                            </div>
+                            
+                            <div className="edit-field-row">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={fieldData.required || false}
+                                        onChange={(e) => handleChange('required', e.target.checked)}
+                                    />
+                                    கட்டாயம்
+                                </label>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                <button className="btn btn-success" onClick={handleSave}>
+                                    சேமிக்க
+                                </button>
+                                <button className="btn btn-danger" onClick={() => setEditingField(null)}>
+                                    ரத்து செய்
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            // லேஅவுட் பொறுத்து பீல்டுகளை காட்ட
+            const renderFields = () => {
+                if (settings.layout === 'single') {
+                    return (
+                        <div className="layout-single">
+                            {fields.map(field => renderFieldItem(field))}
+                        </div>
+                    );
+                } else if (settings.layout === 'double') {
+                    return (
+                        <div className="layout-double">
+                            {fields.map(field => renderFieldItem(field))}
+                        </div>
+                    );
+                } else if (settings.layout === 'mixed') {
+                    const doubleColumnFields = fields.slice(0, 8);
+                    const singleColumnFields = fields.slice(8);
+                    
+                    return (
+                        <div className="layout-mixed">
+                            <div className="mixed-section">
+                                {doubleColumnFields.slice(0, 4).map(field => renderFieldItem(field))}
+                            </div>
+                            <div className="mixed-section">
+                                {doubleColumnFields.slice(4, 8).map(field => renderFieldItem(field))}
+                            </div>
+                            <div className="mixed-section full-width">
+                                {singleColumnFields.map(field => renderFieldItem(field))}
+                            </div>
+                        </div>
+                    );
+                }
+            };
+
+            // ஒரு பீல்டு காட்ட
+            const renderFieldItem = (field) => {
+                const labelText = getText(field.label, field.labelEn);
+                
+                return (
+                    <div key={field.id} className="field-row">
+                        <label className="field-label">
+                            {labelText}
+                            {field.required && <span style={{color: 'red', marginLeft: '4px'}}>*</span>}
+                        </label>
+                        {renderFieldInput(field)}
+                        <div className="field-controls">
+                            <button className="btn btn-primary" onClick={() => moveField(field.id, 'up')}>
+                                <i className="fas fa-arrow-up"></i>
+                            </button>
+                            <button className="btn btn-primary" onClick={() => moveField(field.id, 'down')}>
+                                <i className="fas fa-arrow-down"></i>
+                            </button>
+                            <button className="btn btn-primary" onClick={() => startEditField(field)}>
+                                <i className="fas fa-edit"></i>
+                            </button>
+                            <button className="btn btn-danger" onClick={() => removeField(field.id)}>
+                                <i className="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="app-container">
+                    {editingField && <EditFieldModal />}
+                    
+                    <div className="app-header">
+                        <h1><i className="fas fa-file-alt"></i> முழுமையான படிவ உருவாக்கி</h1>
+                        <p>தமிழ் & ஆங்கிலம் | 3 லேஅவுட் விருப்பங்கள் | இன்சர்ட் டேபில் பீல்டு</p>
+                    </div>
+
+                    <div className="main-content">
+                        <div className="controls-panel">
+                            <div className="section-title">
+                                <i className="fas fa-language"></i> மொழி
+                            </div>
+
+                            <div className="language-selector">
+                                <button 
+                                    className={`lang-btn ${settings.language === 'tamil' ? 'active' : ''}`}
+                                    onClick={() => updateSetting('language', 'tamil')}
+                                >
+                                    தமிழ்
+                                </button>
+                                <button 
+                                    className={`lang-btn ${settings.language === 'english' ? 'active' : ''}`}
+                                    onClick={() => updateSetting('language', 'english')}
+                                >
+                                    English
+                                </button>
+                            </div>
+
+                            <div className="section-title">
+                                <i className="fas fa-cog"></i> படிவ அமைப்புகள்
+                            </div>
+
+                            <div className="form-group">
+                                <label>படிவத் தலைப்பு (தமிழ்)</label>
+                                <input
+                                    type="text"
+                                    value={settings.formTitle}
+                                    onChange={(e) => updateSetting('formTitle', e.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>படிவத் தலைப்பு (ஆங்கிலம்)</label>
+                                <input
+                                    type="text"
+                                    value={settings.formTitleEn}
+                                    onChange={(e) => updateSetting('formTitleEn', e.target.value)}
+                                />
+                            </div>
+
+                            <div className="section-title">
+                                <i className="fas fa-columns"></i> பக்க அமைப்பு
+                            </div>
+
+                            <div className="layout-selector">
+                                <button 
+                                    className={`layout-btn ${settings.layout === 'single' ? 'active' : ''}`}
+                                    onClick={() => updateSetting('layout', 'single')}
+                                >
+                                    ஒற்றை நிரல்
+                                </button>
+                                <button 
+                                    className={`layout-btn ${settings.layout === 'double' ? 'active' : ''}`}
+                                    onClick={() => updateSetting('layout', 'double')}
+                                >
+                                    இரட்டை நிரல்
+                                </button>
+                                <button 
+                                    className={`layout-btn ${settings.layout === 'mixed' ? 'active' : ''}`}
+                                    onClick={() => updateSetting('layout', 'mixed')}
+                                >
+                                    இரண்டும் கலந்தது
+                                </button>
+                            </div>
+
+                            <div className="section-title">
+                                <i className="fas fa-paint-brush"></i> வடிவமைப்பு
+                            </div>
+
+                            <div className="form-group">
+                                <label>எழுத்து நிறம்</label>
+                                <div className="color-picker">
+                                    {colorOptions.map((color, index) => (
+                                        <div
+                                            key={index}
+                                            className={`color-option ${settings.textColor === color ? 'active' : ''}`}
+                                            style={{backgroundColor: color}}
+                                            onClick={() => updateSetting('textColor', color)}
+                                            title={color}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="section-title">
+                                <i className="fas fa-plus"></i> பீல்டுகள் சேர்க்க
+                            </div>
+
+                            <div className="predefined-fields">
+                                {predefinedFields.map((field, index) => (
+                                    <div
+                                        key={index}
+                                        className="predefined-field"
+                                        onClick={() => addField(field.type, field.label, field.labelEn)}
+                                        title={`${field.label} / ${field.labelEn}`}
+                                    >
+                                        <i className={field.icon} style={{marginRight: '8px'}}></i>
+                                        {field.label}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="section-title" style={{marginTop: '25px'}}>
+                                <i className="fas fa-download"></i> செயல்கள்
+                            </div>
+
+                            <div className="btn-group">
+                                <button className="btn btn-success btn-block" onClick={printForm}>
+                                    <i className="fas fa-print"></i> அச்சிடு / PDF
+                                </button>
+                                <button className="btn btn-primary btn-block" onClick={saveForm}>
+                                    <i className="fas fa-save"></i> சேமிக்க
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="form-preview">
+                            <div className="form-preview-page" style={{
+                                color: settings.textColor,
+                                backgroundColor: settings.backgroundColor,
+                                backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                backgroundRepeat: 'no-repeat'
+                            }}>
+                                <div className="form-header">
+                                    <div className="logo-section">
+                                        <div className="logo-box">
+                                            {logo1 ? (
+                                                <img src={logo1} alt="Logo 1" className="logo-img" />
+                                            ) : (
+                                                <div className="logo-placeholder">
+                                                    <label htmlFor="logo1-upload" style={{cursor: 'pointer'}}>
+                                                        <i className="fas fa-plus"></i>
+                                                    </label>
+                                                    <input
+                                                        type="file"
+                                                        id="logo1-upload"
+                                                        accept="image/*"
+                                                        onChange={handleLogoUpload(setLogo1)}
+                                                        style={{display: 'none'}}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="info-text">
+                                            {getText('அலுவலக முத்திரை', 'Office Seal')}
+                                        </div>
+                                    </div>
+
+                                    <div className="title-section">
+                                        <div className="form-main-title">{getText(settings.formTitle, settings.formTitleEn)}</div>
+                                        <div className="form-sub-title">{getText(settings.formSubtitle, settings.formSubtitleEn)}</div>
+                                        {titleRows.map((row) => (
+                                            <div key={row.id} className="form-details">
+                                                {getText(row.text, row.textEn)}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="stamp-section">
+                                        <div className="logo-box">
+                                            {logo2 ? (
+                                                <img src={logo2} alt="Logo 2" className="logo-img" />
+                                            ) : (
+                                                <div className="logo-placeholder">
+                                                    <label htmlFor="logo2-upload" style={{cursor: 'pointer'}}>
+                                                        <i className="fas fa-plus"></i>
+                                                    </label>
+                                                    <input
+                                                        type="file"
+                                                        id="logo2-upload"
+                                                        accept="image/*"
+                                                        onChange={handleLogoUpload(setLogo2)}
+                                                        style={{display: 'none'}}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="info-text">
+                                            {getText('அலுவலக சீல்', 'Office Stamp')}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-body">
+                                    {renderFields()}
+
+                                    <div className="required-documents">
+                                        <div className="field-label">
+                                            {getText('முக்கிய குறிப்புகள்:', 'Important Notes:')}
+                                        </div>
+                                        <ul className="documents-list">
+                                            <li>{getText('அனைத்து கட்டாய கட்டங்களும் நிரப்பப்பட வேண்டும்', 'All mandatory fields must be filled')}</li>
+                                            <li>* {getText('குறியிட்ட கட்டங்கள் கட்டாயம்', 'Marked fields are mandatory')}</li>
+                                            <li>{getText('அனைத்து ஆவணங்களும் சரிபார்க்கப்பட்ட நகல்களாக இருக்க வேண்டும்', 'All documents must be verified copies')}</li>
+                                        </ul>
+                                    </div>
+
+                                    <div className="field-row" style={{marginTop: '40px'}}>
+                                        <div style={{
+                                            paddingTop: '30px',
+                                            borderTop: '2px solid #000'
+                                        }}>
+                                            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                                <div>
+                                                    <div style={{marginBottom: '8px', fontWeight: '600'}}>
+                                                        {getText('விண்ணப்பதாரர் கையொப்பம்', 'Applicant Signature')}
+                                                    </div>
+                                                    <div>{getText('தேதி:', 'Date:')} ________________</div>
+                                                </div>
+                                                <div>
+                                                    <div style={{marginBottom: '8px', fontWeight: '600'}}>
+                                                        {getText('அலுவலகம் சீல்', 'Office Seal')}
+                                                    </div>
+                                                    <div>{getText('தேதி:', 'Date:')} ________________</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="form-actions">
+                                <button className="btn btn-success" onClick={printForm}>
+                                    <i className="fas fa-print"></i> அச்சிடு
+                                </button>
+                                <button className="btn btn-primary" onClick={() => alert('படிவம் சமர்ப்பிக்கப்பட்டது')}>
+                                    <i className="fas fa-check"></i> சமர்ப்பிக்க
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<AdvancedFormBuilder />, document.getElementById('root'));
+    </script>
+</body>
+</html>
